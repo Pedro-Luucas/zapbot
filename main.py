@@ -1,30 +1,42 @@
-import os
 from flask import Flask, request, jsonify
-from dotenv import load_dotenv
-from utils.evolutionAPI import EvolutionAPI
+from utils.evolutionAPI import evoAPI
+import dotenv, os
 
-load_dotenv()
-
-API_KEY = os.getenv("API_KEY2")
-INSTANCE_ID = os.getenv("INSTANCE_ID")
-AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+a = dotenv.load_dotenv()
 
 app = Flask(__name__)
-evo_api = EvolutionAPI()
+api = evoAPI()
 
-@app.route("/webhook", methods=["POST"])
+# Configuração da API
+INSTANCE_ID = "zapbotinstancia"
+API_KEY = os.getenv("API_KEY")
+
+@app.route("/", methods=["POST"])
 def webhook():
-    dados = request.json
-    token = dados.get("apikey")  # O token vem como "apikey" no JSON, não como parâmetro de query
+    data = request.get_json()
+    print("Webhook recebido:", data)
 
-    event = dados.get("event")
-    print("📨 Evento recebido:\n", event, "\n\n\n", dados, "\n\n\n", token, "\n \n \n")
-    
-    evo_api.enviar_mensagem("TESTE DO ZAP", INSTANCE_ID , API_KEY, "554891272434")
+    try:
+        numero = data["message"]["from"]
+        texto = data["message"]["body"]["text"]
 
-    return jsonify({"status": "mensagem processada"}), 200
+        print(f"Recebido de {numero}: {texto}")
+
+        resposta = api.enviar_mensagem(INSTANCE_ID, API_KEY, "numero", " mesnage ")
+
+        return jsonify({
+            "status": "mensagem enviada",
+            "numero": numero,
+            "texto": texto,
+            "resposta_api": resposta.json()
+        })
+
+    except Exception as e:
+        print("Erro:", str(e))
+        return jsonify({"erro": str(e)}), 500
+
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(port=5000)     # ← Inicia o servidor Flask
 
 

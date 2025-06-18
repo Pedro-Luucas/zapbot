@@ -11,12 +11,13 @@ services:
       - AUTHENTICATION_API_KEY=apikey321
       - DATABASE_ENABLED=true
       - DATABASE_PROVIDER=postgresql
-      - DATABASE_CONNECTION_URI=postgresql://postgres:postgres@postgres:5432/zap
+      - DATABASE_CONNECTION_URI=postgresql://postgres:postgres@postgres:5432/zapbot
       - CACHE_REDIS_ENABLED=true
       - CACHE_REDIS_URI=redis://redis:6379/6
       - CACHE_REDIS_PREFIX_KEY=evolution
       - CACHE_REDIS_SAVE_INSTANCES=true
       - CACHE_LOCAL_ENABLED=false
+      - CONFIG_SESSION_PHONE_VERSION=2.3000.1023204200
     volumes:
       - evolution_instances:/evolution/instances
     networks:
@@ -28,7 +29,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=zap
+      - POSTGRES_DB=zapbot
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -41,12 +42,15 @@ services:
     restart: always
     ports:
       - 6379:6379
+    volumes:
+      - evolution_redis:/data
     networks:
       - evolution-net
 
 volumes:
   evolution_instances:
   postgres_data:
+  evolution_redis:
 
 networks:
   evolution-net:
